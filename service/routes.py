@@ -63,7 +63,11 @@ def create_accounts():
 
 # ... place you code here to LIST accounts ...
 @app.route("/accounts", methods=["GET"])
-def get_accounts():
+def get_account_list():
+    """
+    List Accounts
+    This endpoint will get all Accounts and return them as a list of dicts
+    """
     app.logger.info("Request to get a list of all accounts")
     accounts = Account.all()
     account_list = [Account.serialize(i) for i in accounts]
@@ -76,7 +80,21 @@ def get_accounts():
 ######################################################################
 
 # ... place you code here to READ an account ...
+@app.route("/accounts/<int:account_id>", methods=["GET"])
+def get_accounts(account_id):
+    """
+    Reads an Account
+    This endpoint will get an Account with the given account_id and return its json data
+    """
+    app.logger.info(f"Request to get an account with account_id: {account_id}")
 
+    response = Account.find(account_id)
+
+    if not response:
+        abort(status.HTTP_404_NOT_FOUND, f"Account with id [{account_id}] could not be found.")
+
+    app.logger.info(f"Returning account with id {account_id}")
+    return response.serialize(), status.HTTP_200_OK
 
 ######################################################################
 # UPDATE AN EXISTING ACCOUNT

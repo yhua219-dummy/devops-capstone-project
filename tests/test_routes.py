@@ -136,3 +136,28 @@ class TestAccountService(TestCase):
         account_data = response.get_json()
         # assert that the len() of the data is 5 (the number of accounts you created)
         self.assertEqual(len(account_data), 5)
+
+    def test_get_account(self):
+        """It should Read a single Account"""
+        account = self._create_accounts(1)[0]
+        # make a call to self.client.post() to create the account
+        response = self.client.get(f"{BASE_URL}/{account.id}", content_type="application/json")
+        # assert that the resp.status_code is status.HTTP_200_OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # get the data from resp.get_json()
+        data = response.get_json()
+        # assert that data["name"] equals the account.name
+        self.assertEqual(data["name"], account.name)
+
+    def test_get_account_with_wrong_id(self):
+        """It should Raise a 404 error and return an empty dict if account_id does not exist in DB"""
+        accounts = self._create_accounts(5)
+        max_id = max([i.id for i in accounts])
+        account_id = max_id + 999
+        print(f"\n\n========= max_id: {max_id}, account_id: {account_id}\n\n")
+
+        # make a call to self.client.post() to create the account
+        response = self.client.get(f"{BASE_URL}/{account_id}", content_type="application/json")
+        # assert that the resp.status_code is status.HTTP_200_OK
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn(f"Account with id [{account_id}] could not be found.".encode("utf-8"), response.data)
