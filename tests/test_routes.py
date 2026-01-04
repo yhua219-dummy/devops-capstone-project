@@ -154,7 +154,7 @@ class TestAccountService(TestCase):
         accounts = self._create_accounts(5)
         max_id = max([i.id for i in accounts])
         account_id = max_id + 999
-        print(f"\n\n========= max_id: {max_id}, account_id: {account_id}\n\n")
+        print(f"\n\n===1(1)====== max_id: {max_id}, account_id: {account_id}\n\n")
 
         # make a call to self.client.post() to create the account
         response = self.client.get(f"{BASE_URL}/{account_id}", content_type="application/json")
@@ -178,6 +178,44 @@ class TestAccountService(TestCase):
         self.assertEqual(delete_again_response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertIn(f"Account with id [{account_id}] could not be found.".encode("utf-8"), delete_again_response.data)
 
+    def test_update_account(self):
+        """It should Update an existing Account with the given account_id"""
+        # create an Account to update
+        test_account = self._create_accounts(1)[0]
+        account_id = test_account.id
+
+        print(f"\n\n===2(1)====== test_account: {test_account}\n\n")
+
+        # get the data from resp.get_json() as new_account
+        new_account = test_account.serialize()
+        # change new_account["name"] to something known
+        new_name = f"{test_account.name}_xxx"
+        new_account['name'] = new_name
+
+        print(f"\n\n===2(2)====== new_account: {new_account}\n\n")
+        print(f"\n\n===2(3)====== new_name: {new_name}\n\n")
+        # Update the Account by account_id with new data
+        put_response = self.client.put(f"{BASE_URL}/{account_id}", json=new_account)
+        self.assertEqual(put_response.status_code, status.HTTP_200_OK)
+
+        # get the data from resp.get_json() as updated_account
+        updated_account = put_response.get_json()
+        print(f"\n\n===2(4)====== updated_account: {updated_account}\n\n")
+        self.assertEqual(updated_account['name'], new_name)
+
+    def test_update_account_with_bad_id(self):
+        """It should Update an existing Account with the given account_id"""
+        # create an Account to update
+        test_account = self._create_accounts(1)[0]
+        account_id = test_account.id + 999
+
+        # get the data from resp.get_json() as new_account
+        same_data = test_account.serialize()
+
+        # Update the Account by account_id with new data
+        put_response = self.client.put(f"{BASE_URL}/{account_id}", json=same_data)
+        self.assertEqual(put_response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn(f"Account with id [{account_id}] could not be found.".encode("utf-8"), put_response.data)
 
 
         
