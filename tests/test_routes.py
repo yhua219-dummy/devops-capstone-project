@@ -223,4 +223,3 @@ class TestAccountService(TestCase):
         response = self.client.delete(BASE_URL)
         # assert that the resp.status_code is status.HTTP_405_METHOD_NOT_ALLOWED
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-        
