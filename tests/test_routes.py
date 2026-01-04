@@ -217,5 +217,10 @@ class TestAccountService(TestCase):
         self.assertEqual(put_response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertIn(f"Account with id [{account_id}] could not be found.".encode("utf-8"), put_response.data)
 
-
+    def test_method_not_allowed(self):
+        """It should not allow an illegal method call"""
+        # call self.client.delete() on the BASE_URL
+        response = self.client.delete(BASE_URL)
+        # assert that the resp.status_code is status.HTTP_405_METHOD_NOT_ALLOWED
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
         
