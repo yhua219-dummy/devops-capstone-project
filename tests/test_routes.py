@@ -161,3 +161,23 @@ class TestAccountService(TestCase):
         # assert that the resp.status_code is status.HTTP_200_OK
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertIn(f"Account with id [{account_id}] could not be found.".encode("utf-8"), response.data)
+
+    def test_delete_account(self):
+        """It should Delete an Account with the given account_id"""
+        account = self._create_accounts(1)[0]
+        account_id = account.id
+
+        # send a self.client.delete() request to the BASE_URL with an id of an account
+        response = self.client.delete(f"{BASE_URL}/{account_id}")
+
+        # assert that the resp.status_code is status.HTTP_204_NO_CONTENT
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # test finding the deleted account in DB with the given ID, expect 404 and null return
+        delete_again_response = self.client.delete(f"{BASE_URL}/{account_id}")
+        self.assertEqual(delete_again_response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn(f"Account with id [{account_id}] could not be found.".encode("utf-8"), delete_again_response.data)
+
+
+
+        
